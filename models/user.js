@@ -16,6 +16,7 @@ const userSchema = new Schema({
   verifyToken: { type: String },
   forgottenPasswordOTP: { type: String },
   forgottenPasswordOTPExpires: { type: Date },
+  cart: {type: [String]}
   // bookId:{
   //   type:ObjectId, ref:"Book",
   // }

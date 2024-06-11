@@ -31,7 +31,7 @@ export async function POST(request) {
     //Generate JWToken or session token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {});
     console.log(token);
-    return NextResponse.json({ message: "Login successful" }, { status: 200 });
+    return NextResponse.json({ message: "Login successful" }, { status: 200 }, {token: token}, {data: user});
   } catch (error) {
     console.error("Error logging in:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

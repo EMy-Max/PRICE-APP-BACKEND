@@ -4,14 +4,14 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
     try {
-        const { title, author, aboutAuthor, aboutBook, imageUrl, category, price, isFree } = await request.json();
+        const { title, authors, aboutAuthor, aboutBook, imageUrl, category, price, isFree } = await request.json();
         
-        if (!title || !author) {
+        if (!title || !authors) {
             return NextResponse.json({ message: "Title and author are required" }, { status: 400 });
         }
 
         await connectMongoDB();
-        const newBook = await Book.create({ title, author, aboutAuthor, aboutBook, imageUrl, category, price, isFree });
+        const newBook = await Book.create({ title, authors, aboutAuthor, aboutBook, imageUrl, category, price, isFree });
         return NextResponse.json({ message: "New book added", book: newBook }, { status: 201 });
     } catch (error) {
         console.error("Error creating book:", error);

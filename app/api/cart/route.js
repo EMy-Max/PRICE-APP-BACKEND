@@ -1,9 +1,13 @@
+import connectMongoDB from "@/libs/mongodb";
+import Book from "@/models/books";
+import User from "@/models/user";
+import { NextResponse } from "next/server";
 
 // add to cart
 export async function POST(request) {
     try {
-      const { bookId, quantity } = await request.json();
       await connectMongoDB();
+      const { bookId, userId} = await request.json();
       const user = await User.findById(userId);
       const book = await Book.findById(bookId);
 
@@ -15,8 +19,9 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Book not found' }, { status: 404 });
       }
   
-      user.cart.push({ book: book._id, quantity });
-      await user.save();
+      const addBook = await user.cart.push({ book: book._id});
+      console.log (addBook)
+      await user.save(addBook);
   
       return NextResponse.json({ message: 'Book successfully added to cart' }, { status: 201 });
     } catch (error) {
@@ -27,31 +32,6 @@ export async function POST(request) {
       );
     }
   }
-  
-// remove from cart
-export async function DELETE({ params }) {
-  try {
-    const { bookId } = params;
-    await connectMongoDB();
-    const user = await User.findById(userId);
-    const cartItem = user.cart.find((item) => item.book.toString() === bookId);
-
-    if (!cartItem) {
-      return NextResponse.json({ error: 'Cart item not found' }, { status: 404 });
-    }
-
-    user.cart.pull(cartItem);
-    await user.save();
-
-    return NextResponse.json({ message: 'Book removed from cart' }, { status: 200 });
-  } catch (error) {
-    console.error('Error removing book from cart:', error);
-    return NextResponse.json(
-      { error: 'An error occurred while removing the book from the cart' },
-      { status: 500 }
-    );
-  }
-}
 
 //view cart
 export async function GET() {

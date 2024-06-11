@@ -1,14 +1,10 @@
 import mongoose, {Schema} from 'mongoose';
+import Book from './books';
 
 
 const cartSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
-    items: [
-      {
-        book: { type: Schema.Types.ObjectId, ref: 'Book' },
-        quantity: { type: Number, default: 1 },
-      },
-    ],
+    book: {type: Schema.Types.ObjectId, ref: 'Book'},
     price: {type: Number},
   },
   {
