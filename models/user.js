@@ -1,6 +1,7 @@
 import mongoose, {Schema} from "mongoose";
 
 const userSchema = new Schema({
+  userId: {type: Schema.Types.ObjectId},
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -16,10 +17,8 @@ const userSchema = new Schema({
   verifyToken: { type: String },
   forgottenPasswordOTP: { type: String },
   forgottenPasswordOTPExpires: { type: Date },
-  cart: {type: [String]}
-  // bookId:{
-  //   type:ObjectId, ref:"Book",
-  // }
+  // cart: {type: [{}]},
+  // library: {type: [{}]}
 },
 {
     timestamps: true

@@ -1,17 +1,12 @@
-import mongoose, {Schema} from 'mongoose';
-import Book from './books';
-
+import mongoose, { Schema } from "mongoose";
 
 const cartSchema = new Schema({
-    user: { type: Schema.Types.ObjectId, ref: 'User' },
-    book: {type: Schema.Types.ObjectId, ref: 'Book'},
-    price: {type: Number},
-  },
-  {
-    timestamps: true,
-  }
-);
+  userId: { type: Schema.Types.ObjectId, ref: "User" },
+  books: [{ type: Schema.Types.ObjectId, ref: "Book" }],
+}, {
+  timestamps: true,
+});
 
-const Cart = mongoose.models.Cart || mongoose.model('Cart', cartSchema);
+const Cart = mongoose.models.Cart || mongoose.model("Cart", cartSchema);
 
 export default Cart;

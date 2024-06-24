@@ -1,67 +1,67 @@
+import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import Library from "@/models/library";
+import Book from "@/models/books";
+import connectMongoDB from "@/libs/mongodb";
 
-// add to library
-export async function POST(request) {
-    try {
-      const { bookId } = await request.json();
-  
-      if (!bookId) {
-        return NextResponse.json({ message: "Book ID is required" }, { status: 400 });
-      }
-  
-      await connectMongoDB();
-      const book = await Book.findById(bookId);
-  
-      if (!book) {
-        return NextResponse.json({ message: "Book not found" }, { status: 404 });
-      }
-  
-      const user = await User.findById(userId);
-  
-      if (!user) {
-        return NextResponse.json({ message: "User not found" }, { status: 404 });
-      }
-  
-      if (!book.isFree) {
-        // Check if the user has paid for the book
-        const payment = await Payment.findOne({
-          user: user._id,
-          book: book._id,
-          paid: true,
-        });
-  
-        if (!payment) {
-          return NextResponse.json(
-            { message: "You need to purchase this book before adding it to your library" },
-            { status: 403 }
-          );
-        }
-      }
-  
-      user.library.push(bookId);
-      await user.save();
-  
-      return NextResponse.json({ message: "Book added to library" }, { status: 201 });
-    } catch (error) {
-      console.error("Error adding book to library:", error);
-      return NextResponse.json({ message: "Internal server error" }, { status: 500 });
-    }
-  }
-  
+connectMongoDB()
 
-  //view library
-  export async function GET(request) {
-    try {
-      await connectMongoDB();
-      const user = await User.findById(userId).populate('library');
-  
-      if (!user) {
-        return NextResponse.json({ message: "User not found" }, { status: 404 });
-      }
-  
-      return NextResponse.json(user.library, { status: 200 });
-    } catch (error) {
-      console.error("Error fetching library:", error);
-      return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+export async function POST(req) {
+  try {
+    //get token. if this doesnt work, use danny's code
+    const token = req.headers.get("authorization")?.split(" ")[1];
+    console.log("Received token:", token);
+    if (!token) {
+      return NextResponse.json({ message: "please log in" }, { status: 404 });
     }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("DECODED:", decoded);
+
+    const {userId} = decoded;
+    const {bookId} = await req.json();
+    console.log ('user ID:', userId, 'BOOK ID:', bookId)
+    
+    if (!userId) {
+        return NextResponse.json({error: 'User not found. Please log in'},{status:404})
+    }
+    if (!bookId) {
+        return NextResponse.json({error: 'Invalid Request'},{status:404})
+    }
+
+    let userLibrary = await Library.findOne({ userId });
+    if (!userLibrary) {
+        const userLibrary = await Library.create ({ userId });
+        await userLibrary.save();
+        // userLibrary = newLibrary;
+      }
+    console.log("========================");
+
+    const book = await Book.findById(bookId)
+
+    console.log(book)
+    if (!book) {
+        return NextResponse.json({error: 'Book not found'},{status:404})
+    }
+
+    const existingBook = userLibrary.bookId.find((id) => id.toString() === book._id.toString());
+    if (existingBook) {
+        return NextResponse.json({ message: "Book already exists in library" });
+    }
+
+    userLibrary.bookId.push(bookId);
+    await userLibrary.save();
+    console.log('USER LIBRARY: ', userLibrary)
+
+    return NextResponse.json(
+        {message: 'Book added to library'},
+        {status: 201}
+    )
+  } catch (error) {
+    console.log("ERROR ADDING BOOK TO LIBRARY:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
-  
+}

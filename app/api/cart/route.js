@@ -2,28 +2,63 @@ import connectMongoDB from "@/libs/mongodb";
 import Book from "@/models/books";
 import User from "@/models/user";
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import Cart from "@/models/cart_purchase";
 
+
+await connectMongoDB();
 // add to cart
-export async function POST(request) {
+export async function POST(req) {
     try {
-      await connectMongoDB();
-      const { bookId, userId} = await request.json();
-      const user = await User.findById(userId);
-      const book = await Book.findById(bookId);
-
-      if (!user) {
-        return NextResponse.json({ error: 'Please log in or register' }, { status: 404 });
+      //get token. 
+      const token = req.headers.get("authorization")?.split(" ")[1];
+      console.log("Received token:", token);
+      if (!token) {
+        return NextResponse.json({ message: "please log in" }, { status: 404 });
       }
+      
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log("DECODED:", decoded);
+        //get userId and BookId
+      const {userId} = decoded;
+      const {bookId} = await req.json();
+      console.log ('user ID:', userId, 'BOOK ID:', bookId)
 
-      if (!book) {
-        return NextResponse.json({ error: 'Book not found' }, { status: 404 });
-      }
-  
-      const addBook = await user.cart.push({ book: book._id});
-      console.log (addBook)
-      await user.save(addBook);
-  
-      return NextResponse.json({ message: 'Book successfully added to cart' }, { status: 201 });
+      if (!userId) {
+        return NextResponse.json({error: 'User not found. Please log in'},{status:404})
+    }
+    if (!bookId) {
+        return NextResponse.json({error: 'Invalid Request'},{status:404})
+    }
+
+    let cart = await Cart.findOne({ userId });
+    if (!cart) {
+      const cart = await Cart.create({ userId });
+      await cart.save();
+    }
+    console.log("========================", cart);
+
+    const book = await Book.findById(bookId)
+
+    console.log(book)
+    if (!book) {
+        return NextResponse.json({error: 'Book not found'},{status:404})
+    }
+
+    //const existingBook = cart.bookId.find((id) => id.toString() === book._id.toString());
+    const bookInCart = cart.books.find((id) => id.toString() === book._id.toString());
+    if (bookInCart) {
+        return NextResponse.json({ message: "Book already in cart" });
+    }
+
+    cart.books.push(bookId);
+    await cart.save();
+    console.log('USER CART: ', cart)
+
+
+
+      //the down part is clear
+      return NextResponse.json({ message: 'Book added to Cart' }, { status: 201 });
     } catch (error) {
       console.error('Error adding book to cart:', error);
       return NextResponse.json(

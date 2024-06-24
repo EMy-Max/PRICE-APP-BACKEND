@@ -3,11 +3,14 @@ import User from "@/models/user";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
+
+
+connectMongoDB();
 //login user
 export async function POST(request) {
   try {
-    await connectMongoDB();
     const { email, password } = await request.json();
     // check if user exists
     const user = await User.findOne({ email });
@@ -29,9 +32,9 @@ export async function POST(request) {
     }
 
     //Generate JWToken or session token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {});
+    const token = jwt.sign({ userId: user._id, role:user.role, username:`${user.firstName} ${user.lastName}`}, process.env.JWT_SECRET, {});
     console.log(token);
-    return NextResponse.json({ message: "Login successful" }, { status: 200 }, {token: token}, {data: user});
+    return NextResponse.json({ message: "Login successful",  data: user, token: token}, { status: 200 }, {cookies: token});
   } catch (error) {
     console.error("Error logging in:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
