@@ -69,17 +69,4 @@ export async function POST(req) {
   }
 
 //view cart
-export async function GET() {
-    try {
-      await connectMongoDB();
-      const user = await User.findById(userId).populate('cart.book');
-      return NextResponse.json(user.cart, { status: 200 });
-    } catch (error) {
-      console.error('Error fetching cart:', error);
-      return NextResponse.json(
-        { error: 'An error occurred while fetching the cart' },
-        { status: 500 }
-      );
-    }
-  }
   
