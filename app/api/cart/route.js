@@ -36,7 +36,6 @@ export async function POST(req) {
       const cart = await Cart.create({ userId });
       await cart.save();
     }
-    console.log("========================", cart);
 
     const book = await Book.findById(bookId)
 
@@ -55,9 +54,6 @@ export async function POST(req) {
     await cart.save();
     console.log('USER CART: ', cart)
 
-
-
-      //the down part is clear
       return NextResponse.json({ message: 'Book added to Cart' }, { status: 201 });
     } catch (error) {
       console.error('Error adding book to cart:', error);
@@ -69,4 +65,97 @@ export async function POST(req) {
   }
 
 //view cart
+export async function GET(req) {
+  try {
+      // Get token
+      const token = req.headers.get("authorization")?.split(" ")[1];
+      console.log("Received token:", token);
+      if (!token) {
+          return NextResponse.json({ message: "Please log in" }, { status: 401 });
+      }
+
+      // Verify token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log("DECODED:", decoded);
+
+      // Get userId from decoded token
+      const { userId } = decoded;
+      console.log('User ID:', userId);
+
+      if (!userId) {
+          return NextResponse.json({ error: 'User not found. Please log in' }, { status: 404 });
+      }
+
+      // Find the user's cart
+      let cart = await Cart.findOne({ userId }).populate('books');
+
+      if (!cart) {
+          return NextResponse.json({ message: "Cart is empty" }, { status: 200 });
+      }
+
+      // Return the cart contents
+      return NextResponse.json({ cart: cart.books }, { status: 200 });
+
+  } catch (error) {
+      console.error('Error viewing cart:', error);
+      return NextResponse.json(
+          { error: 'An error occurred while viewing the cart' },
+          { status: 500 }
+      );
+  }
+}
+
+//delete from cart
+export async function DELETE(req) {
+  try {
+      // Get token
+      const token = req.headers.get("authorization")?.split(" ")[1];
+      console.log("Received token:", token);
+      if (!token) {
+          return NextResponse.json({ message: "Please log in" }, { status: 401 });
+      }
+
+      // Verify token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log("DECODED:", decoded);
+
+      // Get userId from decoded token and bookId from request body
+      const { userId } = decoded;
+      const { bookId } = await req.json();
+      console.log('User ID:', userId, 'BOOK ID:', bookId);
+
+      if (!userId) {
+          return NextResponse.json({ error: 'User not found. Please log in' }, { status: 404 });
+      }
+      if (!bookId) {
+          return NextResponse.json({ error: 'Invalid Request' }, { status: 400 });
+      }
+
+      // Find the user's cart
+      let cart = await Cart.findOne({ userId });
+      if (!cart) {
+          return NextResponse.json({ error: 'Cart not found' }, { status: 404 });
+      }
+
+      // Check if the book is in the cart
+      const bookIndex = cart.books.indexOf(bookId);
+      if (bookIndex === -1) {
+          return NextResponse.json({ error: 'Book not found in cart' }, { status: 404 });
+      }
+
+      // Remove the book from the cart
+      cart.books.splice(bookIndex, 1);
+      await cart.save();
+
+      console.log('Updated USER CART: ', cart);
+
+      return NextResponse.json({ message: 'Book removed from Cart' }, { status: 200 });
+  } catch (error) {
+      console.error('Error removing book from cart:', error);
+      return NextResponse.json(
+          { error: 'An error occurred while removing the book from the cart' },
+          { status: 500 }
+      );
+  }
+}
   

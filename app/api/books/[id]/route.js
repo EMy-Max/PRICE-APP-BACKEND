@@ -10,7 +10,7 @@ export async function PATCH(request, {params}) {
     await Book.findByIdAndUpdate (id, {...reqBody});
     return NextResponse.json ({message: "Update successful"}, {status:200})
 }  
-export async function GET(request, {params}) {
+export async function GET({params}) {
     const {id} = params;
     await connectMongoDB();
     const book = await Book.findOne({_id: id}); 
