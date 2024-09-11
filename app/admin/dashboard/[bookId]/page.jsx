@@ -9,7 +9,10 @@ import {
 import QuickSearch from "./QuickSearch";
 
 const getBook = async (bookId) => {
-  const res = await fetch(`http://localhost:3000/api/books/${bookId}`, {
+  const bookApiUrl = isDev
+    ? "http://localhost:3000/api/books"
+    : "https://seedapp.vercel.app/api/books";
+  const res = await fetch(`${bookApiUrl}/${bookId}`, {
     next: { tags: ["books"] },
   });
   const data = await res.json();
@@ -17,9 +20,9 @@ const getBook = async (bookId) => {
   return data.books;
 };
 
-export default async function page({params:{bookId}}) {
-const book = await getBook(bookId)
-console.log(book)
+export default async function page({ params: { bookId } }) {
+  const book = await getBook(bookId);
+  // console.log(book);
   return (
     <div>
       <Card className="w-full p-6">Single page</Card>
