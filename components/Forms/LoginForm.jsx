@@ -94,7 +94,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="w-full flex justify-center items-center h-full py-10 md:py-14">
+    <div className="w-full flex justify-center items-center h-full py-10 md:py-14 bg-white min-h-dvh">
       <Card className="w-[350px]  shadow-md">
         <CardHeader>
           <CardTitle className="text-brand mb-2">Welcome Back!</CardTitle>

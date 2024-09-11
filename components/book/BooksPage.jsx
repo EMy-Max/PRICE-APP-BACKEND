@@ -21,9 +21,10 @@ export default async function BooksPage({ tab }) {
   return (
     <div className="grid grid-cols-5 gap-4">
       {books?.map(({ _id, imageUrl }) => (
-        <Card
+        <Link
           className="relative w-full h-72 transition hover:delay-300  hover:scale-105 hover:duration-300"
           key={_id}
+          href={`/admin/dashboard/${_id}`}
         >
           <Image
             src={imageUrl||"/book.jpg"}
@@ -32,11 +33,8 @@ export default async function BooksPage({ tab }) {
             alt="book image"
           />
 
-          <Link
-            href="/"
-            className="absolute w-full h-full hover:bg-blue-700 hover:bg-opacity-30 rounded-md place-content-center text-center text-xs "
-          ></Link>
-        </Card>
+          
+        </Link>
       ))}
     </div>
   );
