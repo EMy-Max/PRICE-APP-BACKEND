@@ -6,7 +6,6 @@ export default function Hero() {
     <div >
       <div className='relative w-full h-dvh'>
         <Image fill src="/hero.png"/>
-        hello
       </div>
     </div>
   )
