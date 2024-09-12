@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import QuickSearch from "./QuickSearch";
+import { isDev } from "../../../../lib/const";
 
 const getBook = async (bookId) => {
   const bookApiUrl = isDev
