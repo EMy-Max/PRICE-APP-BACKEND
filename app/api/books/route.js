@@ -3,16 +3,34 @@ import Book from "@/models/books";
 import { NextResponse } from "next/server";
 
 connectMongoDB();
-export async function GET() {
+
+// export async function GET() {
+//   try {
+//     const books = await Book.find();
+//     return NextResponse.json({ books });
+//   } catch (error) {
+//     console.error("Error fetching books:", error);
+//     return NextResponse.json(
+//       { message: "Internal server error" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const category = searchParams.get('query');
+
   try {
-    const books = await Book.find();
-    return NextResponse.json({ books });
-  } catch (error) {
-    console.error("Error fetching books:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+    if (category) {
+      const books = await Book.find({ category: { $regex: new RegExp(`^${category}$`, 'i') } });
+      return NextResponse.json(books);
+    } else {
+      const books = await Book.find();
+      return NextResponse.json(books);
+    }
+  } catch (err) {
+    return NextResponse.json({ message: err.message }, { status: 500 });
   }
 }
 
