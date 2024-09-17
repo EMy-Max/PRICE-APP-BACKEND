@@ -1,8 +1,8 @@
-import connectMongo from "@/db/connectDb";
+import connectMongoDB from "@/libs/mongodb";
 import UserLibrary from "@/models/userLibrary";
 import jwt from "jsonwebtoken";
 
-connectMongo();
+connectMongoDB();
 
 export async function POST(req) {
   try {
