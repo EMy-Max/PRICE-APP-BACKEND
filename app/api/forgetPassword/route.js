@@ -36,7 +36,7 @@ export async function POST(req){
             from: "Peace House Book App",
             to: user.email,
             subject: "Your One Time Password (OTP)",
-            text: Your one time password is ${otp},
+            text: `Your one time password is ${otp}`,
         };
 
         try {
