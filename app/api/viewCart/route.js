@@ -1,9 +1,9 @@
-export const dynamic = 'force-dynamic'
-import connectMongo from "@/db/connectDb";
+export const dynamic = 'force-dynamic';
+import connectMongoDB from "@/libs/mongodb";
 import UserCart from "@/models/userCart";
 import jwt from "jsonwebtoken";
 
-connectMongo();
+connectMongoDB();
 
 export async function GET(req) {
   try {
