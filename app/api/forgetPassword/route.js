@@ -10,8 +10,10 @@ connectMongoDB();
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: "adefisoyed@gmail.com",
-        pass: "dbsf snbl ggam sjwe",
+        // user: "adefisoyed@gmail.com",
+        // pass: "dbsf snbl ggam sjwe",
+        user: "price.access1@gmail.com"
+        pass: "jcbi zsqd ddty bigv",
     },
 });
 
