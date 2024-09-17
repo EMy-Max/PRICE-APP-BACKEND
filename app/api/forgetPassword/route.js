@@ -5,7 +5,7 @@ import nodemailer from "nodemailer";
 
 
 
-connectMongo();
+connectMongoDB();
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
