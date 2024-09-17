@@ -43,11 +43,11 @@ export async function POST(req) {
         return new Response(JSON.stringify({ error: 'Book already in cart' }), { status: 400 });
       }
 
-      // Add the book to the user's library
+      // Add the book to the user's cart
       userCart.books.push({ bookId });
     }
 
-    // Save the updated library
+    // Save the updated cart
     await userCart.save();
 
     return new Response(JSON.stringify({ message: 'Book added to Cart' }), { status: 200 });
